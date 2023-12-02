@@ -2234,17 +2234,20 @@ int main(int argc, char* argv[]) { //testrazor();
 
   if(scmd) strcpy((char *)codprm,scmd);
   unsigned fcnt = 0;                                                                                  if(verbose>1) printf("dfmt=%d,size=%d\n", dfmt, isize);
-  for(fno = optind; fno < argc; fno++) {
-    char *inname = argv[fno];
+  for(fno = optind; fno < argc; fno++) { //Z: seems like fno stands for file number
+    char *inname = argv[fno]; //Z: the filename is being indexed using 'fno'
     int       i=0,n;
-    long long flen;
+    long long flen; //Z: I'm guessing this is file length
     FILE      *fi = NULL;
     if(!strcmp(inname,"ZIPF") || !strcmp(inname,"TMS")) flen = n = m*abs(isize);
     else {
-      fi = fopen(inname, "rb");                             if(!fi) { perror(inname); continue; }
-      if(dfmt) {
+      fi = fopen(inname, "rb");   //Z: the file is opened to read binary characters from
+	    
+      if(!fi) { perror(inname); continue; }
+	    
+      if(dfmt) { //Z: dfmt is always 0, unless case 'F' gets taken in the switch statement above. So I think it's the else block that's usually taken
         n = flen = befgen(&in, 0, dfmt, isize, fi, kid, skiph, decs, divs, 0 /*be_mindelta*/, errlim);
-      } else {
+      } else { //Z: These are just standard functions to read binray files in C
         fseek(fi, 0, SEEK_END);
         flen = ftell(fi);
         fseek(fi, 0, SEEK_SET);
@@ -2254,6 +2257,8 @@ int main(int argc, char* argv[]) { //testrazor();
 		  char *q,*p = &inname[strlen(inname)]; 
 		  if((q = strrchr(inname, '.')) != NULL) p = q;
           nx = ny = nz = nw = 0;
+		
+	  //Z: Not fully sure yet, but p this while block seems to be collecting bits and x's from the filename itself, then converting them from char to ul
           while(p > &inname[0] && (isdigit(p[-1]) || p[-1]=='x') ) p--;         if(verbose>1) printf("fn='%s' ", p);
                           nx = strtoul(p,   &p, 10);
            if(nx && *p) ny = strtoul(p+1, &p, 10);
@@ -2271,10 +2276,12 @@ int main(int argc, char* argv[]) { //testrazor();
     //if(nw && !nz) nz = 1; if(nz && !ny) ny = 1; if(ny && !nx) nx = 1;
     //if(nx || ny || nz) printf("dim=%dx%dx%dx%d\n", nx, ny, nz, nw);
 
+    //Z: I think these below are just checks to make sure memory gets allocated properly for the length of the strings read in. 
     if(!in && !(in  = (unsigned char*)malloc(n+64+1024        ))) die("malloc error 'in =%d'\n", n); cpy = in;
     if(!(out =        (unsigned char*)malloc(CBUF(n)))) die("malloc error 'out=%d'\n", n);
     if(cmp && !(cpy = (unsigned char*)malloc(CBUF(n)))) die("malloc error 'cpy=%d'\n", n);
-    if(fi) {
+	  
+    if(fi) { //Z: again, this block will get taken, except when case 'F' is encountered in the switch statement above
       if(!dfmt) n = fread(in, 1, n, fi);
       fclose(fi);
 	  int delta = mdelta;
