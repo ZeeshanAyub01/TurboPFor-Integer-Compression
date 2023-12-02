@@ -2329,7 +2329,7 @@ int main(int argc, char* argv[]) { //testrazor();
     be_mindelta = mindelta(in, n/abs(isize), abs(isize)); 
 
     if(fi && verbose>1) {
-	  unsigned l;                                                                                // Calculate bits distributions
+	  unsigned l;  // Calculate bits distributions
       switch(abs(isize)) {
         case 1: l=histl8( in,n);   stprint("file: max", xbits); if(histz8( in,n  )<l) stprint("file: delta max", zbits); break;
         case 2: l=histl16(in,n/2); stprint("file: max", xbits); if(histz16(in,n/2)<l) stprint("file: delta max", zbits); break;
@@ -2366,7 +2366,7 @@ int main(int argc, char* argv[]) { //testrazor();
 	  }
       for(i = id; i <= idx; i++) {
 	    unsigned l = 0;
-        switch(abs(isize)) {
+        switch(abs(isize)) { //Z: Upon examining these bench functions, I found that it's inside these functions that icapp.c interacts with the compression algorithms
           case 1: l = bench8( in, n, out, cpy, i, /*optind+1 == argc?NULL:*/inname, codlev, bsize); break;
           case 2: l = bench16(in, n, out, cpy, i, /*optind+1 == argc?NULL:*/inname, codlev, bsize); break;
           case 4: l = bench32(in, n, out, cpy, i, /*optind+1 == argc?NULL:*/inname, codlev, bsize); break;
@@ -2380,10 +2380,13 @@ int main(int argc, char* argv[]) { //testrazor();
 		}
 	  }
     } while(*p++);
+
+    //Z: this just frees up all the memory that was allocated before
     free(in); free(out); free(cpy);
 	in = out = cpy = NULL;
   }
 
+  //This just prints out the report with the compression methods sorted 
   qsort(lens, 255, sizeof(len_t), cmpsna);
   printf("Best methods =");
   { unsigned c = 0, l=0;
