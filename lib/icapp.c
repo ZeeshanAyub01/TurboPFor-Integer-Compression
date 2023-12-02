@@ -2130,10 +2130,13 @@ int main(int argc, char* argv[]) { //testrazor();
   double        mdelta=-10, errlim=-1.0;
 
   tm_verbose = 3;
+
+  //Z: an array of struct len_t is declared and initialized here
   len_t         lens[256] = { 0 };
   for(fno=0; fno < 255; fno++)
 	lens[fno].id = 0, lens[fno].len = (uint64_t)-1;
 
+  //the following switch statement 
   int c, digit_optind = 0, this_option_optind = optind ? optind : 1, option_index = 0;
   static struct option long_options[] = { {"blocsize",  0, 0, 'b'}, {0, 0, 0}  };
   for(;;) {
